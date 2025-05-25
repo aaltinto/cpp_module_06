@@ -86,6 +86,8 @@ static int isFloat(std::string input)
 		}
 		if (input[i] == '.' && !hasPoint)
 		{
+			if (i == 0 || input[i + 1] == '\0')
+				return -1;
 			hasPoint = 1;
 			continue;
 		}
@@ -95,7 +97,7 @@ static int isFloat(std::string input)
 	
 	char* end;
 	double number = std::strtod(input.c_str(), &end);
-	if (-std::numeric_limits<float>::max() > number || std::numeric_limits<float>::max() < number)
+	if (-std::numeric_limits<float>::max() > number || std::numeric_limits<float>::max() < number || std::numeric_limits<float>::min() > number)
 		return false;
 	return 3;
 }
@@ -206,10 +208,28 @@ static int findPrecision(std::string input)
 	while (++p < size)
 		if (input[p] == '.')
 			break;
-	if (p == size)
-		return 1;
+
+	std::string sciNotation;
+	int pow = 0;
+	size_t e = input.find('e');
+	if (e == std::string::npos)
+		e = input.find('E');
+	if (e != std::string::npos)
+		sciNotation = input.substr(e + 1, size);
+	if (sciNotation.size() > 0)
+		pow = std::atoi(sciNotation.c_str());
+
 	if (input[size - 1] == 'f')
 		size = size -1;
+	if (p == size)
+		return 1;
+
+	if (e != std::string::npos )
+	{
+		if (pow > size - (p + 1 + pow))
+			return 1;
+		return size - (p + 1 + pow) - (sciNotation.size() + 1);
+	}
 	return size - (p + 1);
  }
 
@@ -243,7 +263,6 @@ static void printFloat(std::string input)
 }
 static void printDouble(std::string input)
 {
-
 	char* end;
 	double d = std::strtod(input.c_str(), &end);
 	if (d < 128 && d >= 0)
@@ -263,9 +282,10 @@ static void printDouble(std::string input)
 	}
 	else
 		std::cout << "int: " << "impossible" << std::endl;
-	std::cout << std::fixed << std::setprecision(findPrecision(input));
 	float f = static_cast<float>(d);
+	(f == 0) ? std::cout << std::fixed << std::setprecision(1) : std::cout << std::fixed << std::setprecision(findPrecision(input));
 	std::cout << "float: " << f << "f" << std::endl;
+	std::cout << std::fixed << std::setprecision(findPrecision(input));
 	std::cout << "double: " << d << std::endl;
 
 }
