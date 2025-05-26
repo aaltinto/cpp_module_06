@@ -3,7 +3,7 @@
 #include "B.hpp"
 #include "C.hpp"
 #include <iostream>
-#include <random>
+#include <cstdlib>
 
 Base::~Base(void)
 {

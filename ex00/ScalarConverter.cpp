@@ -132,8 +132,8 @@ static int isFloat(std::string input)
 		return false;
 	float toFloat = static_cast<float>(number);
 	double roundTrip = static_cast<double>(toFloat);
-	double tolerance = std::numeric_limits<float>::epsilon() * std::fabs(number);
-	if (std::fabs(roundTrip - number) > tolerance)
+	double tolerance = std::numeric_limits<float>::epsilon() * std::abs(number);
+	if (std::abs(roundTrip - number) > tolerance)
 		return false;
 	return 3;
 }

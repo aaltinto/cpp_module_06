@@ -25,9 +25,7 @@ int main()
         temp = temp->next;
         i++;
     }
-    std::cout << sizeof(node1) << std::endl;
     uintptr_t raw = Serializer::serialize(&node1);
-    std::cout << sizeof(raw) << std::endl;
     Data *temp2 = Serializer::deserialize(raw);
     i = 1;
     while (temp2)
