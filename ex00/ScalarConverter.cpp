@@ -37,14 +37,45 @@ static int isChar(std::string input)
 	return false;
 }
 
+static int findPrecision(std::string input)
+{
+	int p = -1;
+	int size = static_cast<int>(input.size());
+	while (++p < size)
+		if (input[p] == '.')
+			break;
+
+	std::string sciNotation;
+	int pow = 0;
+	size_t e = input.find('e');
+	if (e == std::string::npos)
+		e = input.find('E');
+	if (e != std::string::npos)
+		sciNotation = input.substr(e + 1, size);
+	if (sciNotation.size() > 0)
+		pow = std::atoi(sciNotation.c_str());
+
+	if (input[size - 1] == 'f')
+		size = size -1;
+	if (p == size)
+		return 1;
+
+	if (e != std::string::npos )
+	{
+		if (pow > size - (p + 1 + pow))
+			return 1;
+		return size - (p + 1 + pow) - (sciNotation.size() + 1);
+	}
+	return size - (p + 1);
+ }
+
 static int isInt(std::string input)
 {
 	int hasSign = 0;
-	if (input.size() > 11)
-		return false;
+
 	for (size_t i = 0; i < input.size(); i++)
 	{
-		if ((input[i] == '+' || input[i] == '-') && !hasSign)
+		if (i == 0 && (input[i] == '+' || input[i] == '-') && !hasSign)
 		{
 			hasSign = 1;
 			continue;
@@ -52,7 +83,7 @@ static int isInt(std::string input)
 		if (!std::isdigit(input[i]))
 			return false;
 	}
-	long number = std::stol(input.c_str());
+	double number = std::strtod(input.c_str(), NULL);
 	if (std::numeric_limits<int>::min() > number || std::numeric_limits<int>::max() < number)
 		return false;
 	return 2;
@@ -67,7 +98,7 @@ static int isFloat(std::string input)
 
 	for (size_t i = 0; i < input.size(); i++)
 	{
-		if ((input[i] == '+' || input[i] == '-') && !hasSign)
+		if (i == 0 && (input[i] == '+' || input[i] == '-') && !hasSign)
 		{
 			hasSign = 1;
 			continue;
@@ -84,7 +115,7 @@ static int isFloat(std::string input)
 				i++;
 			continue;
 		}
-		if (input[i] == '.' && !hasPoint)
+		if (i + 1 < input.size() && input[i] == '.' && std::isdigit(input[i + 1]) && !hasPoint)
 		{
 			if (i == 0 || input[i + 1] == '\0')
 				return -1;
@@ -94,10 +125,15 @@ static int isFloat(std::string input)
 		if (!std::isdigit(input[i]))
 			return -1;
 	}
-	
-	char* end;
-	double number = std::strtod(input.c_str(), &end);
-	if (-std::numeric_limits<float>::max() > number || std::numeric_limits<float>::max() < number || std::numeric_limits<float>::min() > number)
+
+	double number = std::strtod(input.c_str(), NULL);
+	if (-std::numeric_limits<float>::max() > number
+		|| std::numeric_limits<float>::max() < number)
+		return false;
+	float toFloat = static_cast<float>(number);
+	double roundTrip = static_cast<double>(toFloat);
+	double tolerance = std::numeric_limits<float>::epsilon() * std::fabs(number);
+	if (std::fabs(roundTrip - number) > tolerance)
 		return false;
 	return 3;
 }
@@ -180,7 +216,7 @@ static void printChar(std::string input)
 
 static void printInt(std::string input)
 {
-	int i = std::atoi(input.c_str());
+	int i = std::strtod(input.c_str(), NULL);
 	if (i < 128 && i >= 0)
 	{
 		char c = static_cast<char>(i);
@@ -192,46 +228,14 @@ static void printInt(std::string input)
 	else
 		std::cout << "char: " << "impossible" << std::endl;
 		
-	std::cout << "int: " << i << std::endl;
 	std::cout << std::fixed << std::setprecision(1);
+	std::cout << "int: " << i << std::endl;
 	float f = static_cast<float>(i);
 	std::cout << "float: " << f << "f" << std::endl;
 	double d = static_cast<double>(i);
 	std::cout << "double: " << d << std::endl;
 
 }
-
-static int findPrecision(std::string input)
-{
-	int p = -1;
-	int size = static_cast<int>(input.size());
-	while (++p < size)
-		if (input[p] == '.')
-			break;
-
-	std::string sciNotation;
-	int pow = 0;
-	size_t e = input.find('e');
-	if (e == std::string::npos)
-		e = input.find('E');
-	if (e != std::string::npos)
-		sciNotation = input.substr(e + 1, size);
-	if (sciNotation.size() > 0)
-		pow = std::atoi(sciNotation.c_str());
-
-	if (input[size - 1] == 'f')
-		size = size -1;
-	if (p == size)
-		return 1;
-
-	if (e != std::string::npos )
-	{
-		if (pow > size - (p + 1 + pow))
-			return 1;
-		return size - (p + 1 + pow) - (sciNotation.size() + 1);
-	}
-	return size - (p + 1);
- }
 
 static void printFloat(std::string input)
 {

@@ -18,14 +18,17 @@ Base* Base::genereate(void)
     switch (derived % 3)
     {
         case 0:{
+            std::cout << "Generated class is A" << std::endl;
             A* ptr = new A;
             return ptr;
         }
             case 1:{
+                std::cout << "Generated class is B" << std::endl;
                 B* ptr2 = new B;
                 return ptr2;
             }
         case 2: {
+            std::cout << "Generated class is C" << std::endl;
             C* ptr3 = new C;
             return ptr3;
         }
