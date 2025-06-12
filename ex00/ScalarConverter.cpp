@@ -21,7 +21,7 @@ ScalarConverter::~ScalarConverter(void)
 	
 }
 
-ScalarConverter const	&ScalarConverter::operator=(const ScalarConverter &copy)
+ScalarConverter	&ScalarConverter::operator=(const ScalarConverter &copy)
 {
 	(void)copy;
 	std::cout << "Copy assignment op called" << std::endl;
@@ -59,10 +59,9 @@ static int findPrecision(std::string input)
 		size = size -1;
 	if (p == size)
 		return 1;
-
 	if (e != std::string::npos )
 	{
-		if (pow > size - (p + 1 + pow))
+		if (pow >= size - (p + 1 + pow) - static_cast<int>(sciNotation.size() + 1))
 			return 1;
 		return size - (p + 1 + pow) - (sciNotation.size() + 1);
 	}

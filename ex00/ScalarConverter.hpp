@@ -10,7 +10,7 @@ class ScalarConverter
 		~ScalarConverter(void);
 	public:
 		/* Basic Operators */
-		ScalarConverter const	&operator=(ScalarConverter const &copy);
+		ScalarConverter	&operator=(ScalarConverter const &copy);
 
 		static void convert(std::string input);
 	};
